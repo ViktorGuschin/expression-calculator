@@ -38,7 +38,19 @@ function expressionCalculator(expr) {
   };
   let output = [];
   let stack = [];
-  const arrExpr = expr.split(' ').filter(el => el !== '');
+
+  const operations = ['+', '-', '*', '/', '(', ')'];
+  const exprLength = expr.length;
+  let exprWithSpace = '';
+  for (let i = 0; i < exprLength - 1; i++) {
+    hasInExpr = operations.indexOf(expr[i]);
+    if (hasInExpr !== -1) {
+      exprWithSpace +=
+        expr.slice(0, i) + ' ' + expr.slice(i, i + 1) + ' ' + expr.slice(i + 1);
+    }
+  }
+
+  const arrExpr = exprWithSpace.split(' ').filter(el => el !== '');
 
   arrExpr.map((el, index) => {
     if (el === '(') {
@@ -74,6 +86,4 @@ function expressionCalculator(expr) {
 //   expressionCalculator,
 // };
 
-console.log(
-  expressionCalculator(' 72 * 95 + 53 + (  2 + 76 - 52 / 1 - 47  ) '),
-);
+console.log(expressionCalculator('2-2'));
