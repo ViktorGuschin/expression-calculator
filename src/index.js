@@ -4,32 +4,6 @@ function eval() {
 }
 
 function expressionCalculator(expr) {
-  // function checkBracets(str, bracketsConfig) {
-  //   if (str.length % 2 !== 0) {
-  //     return false;
-  //   }
-  //   const arrBrackets = bracketsConfig.map(el => el[0] + el[1]);
-  //   while (str.length !== 0) {
-  //     let hasBracket = false;
-  //     for (let element of arrBrackets) {
-  //       hasBracket = str.indexOf(element) !== -1;
-  //       if (hasBracket) {
-  //         break;
-  //       }
-  //     }
-  //     if (!hasBracket && str.length !== 0) {
-  //       return false;
-  //     }
-  //     arrBrackets.forEach(element => {
-  //       str = str.split(element).join('');
-  //     });
-  //   }
-  //   return true;
-  // }
-  // if (!checkBracets(expr, ['(', ')'])) {
-  //   throw new Error('ExpressionError: Brackets must be paired');
-  // }
-
   const priority = {
     '*': 2,
     '/': 2,
@@ -40,13 +14,17 @@ function expressionCalculator(expr) {
   let stack = [];
 
   const operations = ['+', '-', '*', '/', '(', ')'];
-  const exprLength = expr.length;
-  let exprWithSpace = '';
-  for (let i = 0; i < exprLength - 1; i++) {
-    hasInExpr = operations.indexOf(expr[i]);
+  let exprWithSpace = expr;
+  for (let i = 0; i < exprWithSpace.length - 1; i++) {
+    hasInExpr = operations.indexOf(exprWithSpace[i]);
     if (hasInExpr !== -1) {
-      exprWithSpace +=
-        expr.slice(0, i) + ' ' + expr.slice(i, i + 1) + ' ' + expr.slice(i + 1);
+      exprWithSpace =
+        exprWithSpace.slice(0, i) +
+        ' ' +
+        exprWithSpace.slice(i, i + 1) +
+        ' ' +
+        exprWithSpace.slice(i + 1);
+      i++;
     }
   }
 
@@ -79,11 +57,53 @@ function expressionCalculator(expr) {
     output.push(stack.pop());
   }
 
-  return 0;
+  let first = 0;
+  let second = 0;
+  let temp = 0;
+  const plus = (a, b) => a + b;
+  const minus = (a, b) => a - b;
+  const multuple = (a, b) => a * b;
+  const division = (a, b) => {
+    if (+b === 0) {
+      throw new Error('TypeError: Division by zero.');
+    }
+    return a / b;
+  };
+  for (let i = 0; i < output.length; i++) {
+    if (operations.indexOf(output[i]) !== -1) {
+      first = output[i - 2];
+      second = output[i - 1];
+      switch (output[i]) {
+        case '*':
+          temp = multuple(first, second);
+          output[i] = temp;
+          output.splice(i - 2, 2);
+          i = 0;
+          break;
+        case '/':
+          temp = division(first, second);
+          output[i] = temp;
+          output.splice(i - 2, 2);
+          i = 0;
+          break;
+        case '+':
+          temp = plus(+first, +second);
+          output[i] = temp;
+          output.splice(i - 2, 2);
+          i = 0;
+          break;
+        case '-':
+          temp = minus(first, second);
+          output[i] = temp;
+          output.splice(i - 2, 2);
+          i = 0;
+          break;
+      }
+    }
+  }
+  return output[0];
 }
 
-// module.exports = {
-//   expressionCalculator,
-// };
-
-console.log(expressionCalculator('2-2'));
+module.exports = {
+  expressionCalculator,
+};
